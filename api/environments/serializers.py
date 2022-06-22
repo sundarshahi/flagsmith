@@ -43,6 +43,7 @@ class EnvironmentSerializerLight(serializers.ModelSerializer):
             "api_key",
             "project",
             "minimum_change_request_approvals",
+            "expose_traits_to_clients",
         )
 
     def create(self, validated_data):

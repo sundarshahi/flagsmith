@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from core.request_origin import RequestOrigin
 from django.conf import settings
 from drf_yasg2.utils import swagger_auto_schema
 from rest_framework import status, viewsets
@@ -221,12 +222,19 @@ class SDKIdentities(SDKAPIView):
         serialized_flags = FeatureStateSerializerFull(
             all_feature_states, many=True, context={"identity": identity}
         )
-        serialized_traits = TraitSerializerBasic(
-            identity.identity_traits.all(), many=True
-        )
+
+        traits_data = []
+        if (
+            self.request.originated_from == RequestOrigin.SERVER
+            or self.request.environment.expose_traits_to_clients
+        ):
+            serialized_traits = TraitSerializerBasic(
+                identity.identity_traits.all(), many=True
+            )
+            traits_data = serialized_traits.data
 
         identify_integrations(identity, all_feature_states)
 
-        response = {"flags": serialized_flags.data, "traits": serialized_traits.data}
+        response = {"flags": serialized_flags.data, "traits": traits_data}
 
         return Response(data=response, status=status.HTTP_200_OK)
