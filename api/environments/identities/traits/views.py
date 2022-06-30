@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import BadRequest
 from django.db.models import Q
 from drf_yasg2 import openapi
 from drf_yasg2.utils import swagger_auto_schema
@@ -216,7 +215,10 @@ class SDKTraits(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def bulk_create(self, request):
         try:
             if not request.environment.trait_persistence_allowed(request):
-                raise BadRequest("Unable to set traits with client key.")
+                return Response(
+                    {"non_field_errors": ["Unable to set traits with client key."]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             # endpoint allows users to delete existing traits by sending null values
             # for the trait value so we need to filter those out here
