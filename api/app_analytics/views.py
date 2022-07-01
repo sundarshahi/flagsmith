@@ -20,7 +20,13 @@ class SDKAnalyticsFlags(GenericAPIView):
     def post(self, request, *args, **kwargs):
         """
         Send flag evaluation events from the SDK back to the API for reporting.
+
+        Data should be in the format:
+
+         {"<feature name>": <evaluation count>, ...}
+         e.g. {"my_feature": 13, "my_other_feature": 21}
         """
+
         if settings.INFLUXDB_TOKEN:
             track_feature_evaluation_influxdb(request.environment.id, request.data)
 

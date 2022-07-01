@@ -1,4 +1,5 @@
 import logging
+import typing
 import uuid
 
 import requests
@@ -123,12 +124,19 @@ def track_request_influxdb(request):
         influxdb.write()
 
 
-def track_feature_evaluation_influxdb(environment_id, feature_evaluations):
+def track_feature_evaluation_influxdb(
+    environment_id: int, feature_evaluations: typing.Dict[str, int]
+):
     """
     Sends Feature analytics event data to InfluxDB
 
+    feature_evaluations should be in the format:
+
+     {"<feature name>": <evaluation count>}
+      e.g. {"my_feature": 13}
+
     :param environment_id: (int) the id of the environment the feature is being evaluated within
-    :param feature_evaluations: (dict) A collection of key id / evaluation counts
+    :param feature_evaluations: (dict) dictionary of {feature_name: evaluation count}
     """
     influxdb = InfluxDBWrapper("feature_evaluation")
 
